@@ -1,7 +1,6 @@
 #author:Roya
 #script name:RyndOne-deploy
 #creation time:2020-01-23
-#action:One click deployment of Yum source and NFS server
 #!/bin/bash
 echo "input 1:Configure Yum source"
 echo "input 2:Configure IP address,gateway,subnet mask,DNS server"
