@@ -6,6 +6,7 @@ echo "input 1:Configure Yum source"
 echo "input 2:Configure IP address,gateway,subnet mask,DNS server"
 echo "input 3:Configure NFS server"
 echo "input 4:Configure dhcp server" 
+echo "input 5:Configure DNS server"
 read -p "please input 1,2,3,4: " a 
 case $a in #使用case语句判断输入
 1)
@@ -35,6 +36,7 @@ read -p "please enter Please enter the network card name(Tips:ens33,eth0): " nam
 nmcli connection modify $name ipv4.method manual
 nmcli connection modify $name ipv4.addresses $IPad
 nmcli connection modify $name ipv4.dns $DNS ipv4.gateway $gate
+nmcli connection modify $name connection.autoconnect yes
 systemctl restart network 
 if [ $? -eq 0 ]
 then 
@@ -86,11 +88,7 @@ yum install -y dhcp &> /dev/null
 if [ $? -eq 0 ]
 then 
 read -p "Please enter the type of DNS service dynamic update(Tips:none,interim,ad-hoc): " style
-if [ $style == none ] && [ $style == interim ] && [ $style == ad-hoc ] 
-then
 read -p "Allow/ignore client update DNS records(Tips:allow/ignore): " judge
-if [ $judge == allow ] && [ $judge == ignore ]
-then 
 read -p "Please enter a DNS domain(Tips:roya.com): " domain 
 IP=`ifconfig | awk -F ' ' 'NR==2{print$2}'` 
 NETMASK=`ifconfig | awk -F ' ' 'NR==2{print$4}'`
@@ -118,13 +116,8 @@ then echo "DHCP service configuration succeeded!"
 systemctl enable dhcpd &> /dev/null
 firewall --add-service=dhcp --permanent &> /dev/null
 firewall --reload &> /dev/null
+systemctl status dhcpd
 else echo "DHCP service configuration failed!"
-fi
-else "input error!" 
-exit 0
-fi
-else "input error!"
-exit 0
 fi
 else echo "DHCP service not installed successfully!"
 fi
