@@ -1,11 +1,12 @@
 #author:Roya
 #script name:RyndOne-deploy
 #creation time:2020-01-23
+#version:0.1
 #!/bin/bash
 echo "input 1:Configure Yum source"
 echo "input 2:Configure IP address,gateway,subnet mask,DNS server"
 echo "input 3:Configure NFS server"
-echo "input 4:Configure dhcp server" 
+echo "input 4:Configure DHCP server" 
 echo "input 5:Configure DNS server"
 read -p "please input 1,2,3,4: " a 
 case $a in #使用case语句判断输入
