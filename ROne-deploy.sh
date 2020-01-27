@@ -1,4 +1,3 @@
-```powershell
 #author:Roya
 #script name:ROne-deploy
 #creation time:2020-01-23
@@ -538,5 +537,3 @@ fi
 exit 0
 ;;
 esac
-
-```
