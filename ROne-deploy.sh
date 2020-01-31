@@ -2,30 +2,30 @@
 #script name:ROne-deploy
 #creation time:2020-01-23
 #update time:2020-01-26
-#version:0.20
+#version:0.23
+#description:One click deployment of CentOS service
 #!/bin/bash
-echo "------------------------------"
-echo "|input 1:Configure Yum source|"
-echo "------------------------------"
-echo "|input 2:Configure IP address|"
-echo "------------------------------"
-echo "|input 3:Configure NFS server|"
-echo "------------------------------"
-echo "|input 4:Configure DHCP server|" 
-echo "------------------------------"
-echo "|input 5:Configure DNS server|"
-echo "-------------------------------------------------------"
-echo "|input 6:Configure PXE unattended installation service|"
-echo "-------------------------------------------------------"
-read -p "|please input 1,2,3,4,5,6|: " a 
-case $a in #使用case语句判断输入
-1)
-echo "-------------------------------------"
-echo "|Prepare to configure Yum source...|"
-echo "-------------------------------------"
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 1:Configure Yum source|\033[0m"
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 2:Configure IP address|\033[0m"
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 3:Configure NFS server|\033[0m"
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 4:Configure DHCP server|\033[0m" 
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 5:Configure DNS server|\033[0m"
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|input 6:Configure PXE unattended installation service|\033[0m"
+echo -e "\033[031m-------------------------------------------------------\033[0m"
+read -p "please input 1,2,3,4,5,6:" a 
+function yum {
+echo -e "\033[031m------------------------------\033[0m"
+echo -e "\033[034m|Prepare to configure Yum source...|\033[0m"
+echo -e "\033[031m------------------------------------\033[0m"
 sleep 1  #等一秒执行下面命令
-echo "|One moment...please|"
-echo "---------------------"
+echo -e "\033[034m|One moment...please|\033[0m"
+echo -e "\033[031m---------------------\033[0m"
 if [ -e /media/cdrom ]
 then sleep 0.7
 else mkdir /media/cdrom
@@ -37,21 +37,19 @@ name=rhel
 baseurl=file:///media/cdrom
 gpgcheck=0
 enabled=1' >> /etc/yum.repos.d/rhel.repo #yum源的配置文件
-sleep 2.7
 yum makecache &> /dev/null
 if [ $? -eq 0 ]
 then
 sleep 0.7
-echo "----------------------------------------"
-echo "|Yum source configuration successfully!|"
-echo "----------------------------------"
-else echo "|Yum source configuration failed!|"
-echo "----------------------------------"
+echo -e "\033[034m|Yum source configuration successfully!|\033[0m"
+echo -e "\033[031m----------------------------------------\033[0m"
+else echo -e "\033[031m|Yum source configuration failed!|\033[0m"
+echo -e "\033[031m----------------------------------\033[0m"
 fi
 yum repolist | grep repolist
-;;
-2) #配置IP地址
-echo "----------------------------------------------------------------"
+}
+function IP {
+echo -e "\033[031m----------------------------------------------------------------\033[0m"
 read -p "|please enter Please enter the network card name(Tips:ens33,eth0)|: " wlanname #请输入网卡名
 if [ -e /etc/sysconfig/network-scripts/ifcfg-$wlanname ]
 then 
@@ -60,16 +58,16 @@ else echo "input error!"
 exit 0
 fi
 sleep 0.7 
-echo "----------------------------------------------------------------"
+echo -e "\033[031m----------------------------------------------------------------\033[0m"
 read -p "|Please enter IP address(Tips:192.168.1.1/24)|: " IPad #请输入IP地址
 sleep 0.7
-echo "-------------------------------------------"
+echo -e "\033[031m-------------------------------------------\033[0m"
 read -p "|Please enter GATEWAY(Tips:192.168.1.254)|: " gate #请输入网关
 sleep 0.7
-echo "-----------------------------------------------"
+echo -e "\033[031m-----------------------------------------------\033[0m"
 read -p "|please enter DNS server(Tips:114.114.114.114)|: " DNS #请输入网关
 sleep 0.7
-echo "-----------------------------------------------------------"
+echo -e "\033[031m-----------------------------------------------------------\033[0m"
 nmcli connection modify $wlanname ipv4.addresses $IPad
 nmcli connection modify $wlanname ipv4.method manual 
 nmcli connection modify $wlanname ipv4.dns $DNS ipv4.gateway $gate &>/dev/null
@@ -77,33 +75,33 @@ nmcli connection modify $wlanname connection.autoconnect yes &>/dev/null
 systemctl restart network 
 if [ $? -eq 0 ]
 then
-echo "|Network configuration successful!|" #网络配置成功
-echo "----------------------------------"
+echo -e "\033[034m|Network configuration successful!|\033[0m" #网络配置成功
+echo -e "\033[031m----------------------------------\033[0m"
 ifconfig | awk 'NR==2'
-else echo "Network configuration failed!" 
+else echo -e "\033[031m|Network configuration failed!|\033[0m" 
 fi
-;;
-3) #配置NFS服务
+}
+function NFS {
 echo "-------------------------------------"
 yum install -y nfs-utils &> /dev/null #安装nfs服务端
 if [ $? -eq 0 ]
-then echo '|NFS service installed successfully!|'  #nfs服务安装成功
-echo "-------------------------------------------------------------"
+then echo -e "|NFS service installed successfully!|"  #nfs服务安装成功
+echo "\033[031m-------------------------------------------------------------\033[0m"
 read -p '|Please enter NFS directory path you want to share(Tips:/nfsdir)|: ' nfsdir #输入nfs共享的目录
-echo "------------------------------------------------------------"
+echo -e "\033[031m------------------------------------------------------------\033[0m"
 sleep 0.7 
 read -p '|Please enter the IP address of the host allowed to be shared(Tips:192.168.1.1 or 192.168.1.*)|: ' nfsIP #输入允许共享的主机IP地址或者网段
-echo "---------------------------------------------------------------"
+echo -e "\033[031m---------------------------------------------------------------\033[0m"
 sleep 0.7
 read -p '|Please enter the permission of the shared host(Tips:sync,rw,ro)|: ' nfspwr #输入允许共享的主机的权限
-echo "-------------------------------"
+echo -e "\033[031m-------------------------------\033[0m"
 sleep 0.7
-echo "|Configuring..... Please wait.|"
-echo "-------------------------------"
+echo -e "\033[034m|Configuring..... Please wait.|\033[0m"
+echo -e "\033[031m-------------------------------\033[0m"
 sleep 3
 if [ -e $nfsdir ] #判断nfs共享目录是否存在
-then echo '|File Exists|' 
-echo "------------"
+then echo -e "\033[031m|File Exists|\033[0m"
+echo -e "\033[031m------------\033[0m"
 sleep 0.7
 else mkdir $nfsdir
 chmod -Rf 777 $nfsdir
@@ -116,8 +114,8 @@ IP=`ifconfig | awk -F ' ' 'NR==2{print$2}'` #使用awk命令提取出IP地址
 exportfs -r 
 showmount -e $IP
 if [ $? -eq 0 ] #判断服务是否配置正确
-then echo "NFS server has been configured successfully!"
-else echo "NFS server has been configured failed!"
+then echo -e "\033[034mNFS server has been configured successfully!\033[0m"
+else echo -e "\033[031mNFS server has been configured failed!\033[0m"
 fi
 fi
 systemctl restart rpcbind  
@@ -126,28 +124,28 @@ systemctl enable nfs-server &> /dev/null #加入到开机自启动
 firewall-cmd --add-service=nfs --permanent &> /dev/null
 firewall-cmd --add-service=rpc-bind --permanent &> /dev/null
 firewall-cmd --reload &> /dev/null
-else echo 'NFS service installion failed!'
+else echo -e "\033[031mNFS service installion failed!\033[0m"
 fi
-;;
-4) #配置DHCP服务
-echo "-------------------"
-echo '|one momnet...please|' 
+}
+function DHCP {
+echo -e "\033[031m-------------------\033[0m"
+echo -e "\033[034m|one momnet...please|\033[0m"
 yum install -y dhcp &> /dev/null 
 if [ $? -eq 0 ]
 then 
-echo "DHCP service installed successfully!"
-echo "----------------------------------------------------------------------------"
+echo -e "\033[034mDHCP service installed successfully!\033[0m"
+echo -e "\033[031m----------------------------------------------------------------------------\033[0m"
 read -p "|Please enter the type of DNS service dynamic update(Tips:none,interim,ad-hoc)|: " style  #请输入DNS服务动态更新的类型
 case $style in 
 none|interim|ad-hoc)
 continue
 ;;
 *)
-echo "input error!"
+echo -e "\033[031m|input error!|\033[0m"
 exit 0
 ;;
 esac
-echo "---------------------------------------------------------"
+echo -e "\033[031m---------------------------------------------------------\033[0m"
 sleep 0.7
 read -p "|Allow/ignore client update DNS records(Tips:allow/ignore)|: " judge #允许/忽略客户端更新DNS记录
 case $judge in
@@ -155,14 +153,14 @@ allow|ignore)
 continue
 ;;
 *)
-echo "input error!"
+echo -e "\033[031|minput error!|\033[0m"
 exit 0
 ;;
 esac
-echo "------------------------------------------"
+echo -e "\033[031m------------------------------------------\033[0m"
 sleep 0.7
 read -p "|Please enter a DNS domain(Tips:roya.com)|: " domain #请输入DNS域
-echo "------------------------------------------"
+echo -e "\033[031m------------------------------------------\033[0m"
 sleep 0.7
 IP=`ifconfig | awk -F ' ' 'NR==2{print$2}'`  #IP地址
 NETMASK=`ifconfig | awk -F ' ' 'NR==2{print$4}'` #子网掩码
@@ -186,19 +184,19 @@ max-lease-time 43200;
 EOF
 systemctl restart dhcpd 
 if [ $? -eq 0 ]
-then echo "DHCP service configuration succeeded!"
+then echo -e "\033[034mDHCP service configuration succeeded!\033[0m"
 systemctl enable dhcpd &> /dev/null
 firewall --add-service=dhcp --permanent &> /dev/null
 firewall --reload &> /dev/null
 systemctl status dhcpd
-else echo "DHCP service configuration failed!"
+else echo -e "\033[031mDHCP service configuration failed!\033[0m"
 fi
-else echo "DHCP service not installed successfully!"
+else echo -e "\033[031mDHCP service not installed successfully!\033[0m"
 fi
-;;
-5) #配置DNS服务
-echo "---------------------"
-echo "|one moment...please|"
+}
+function DNS {
+echo -e "\033[031m---------------------\033[0m"
+echo -e "\033[034m|one moment...please|\033[0m"
 yum install -y bind* &> /dev/null 
 if [ $? -eq 0 ]
 then
@@ -253,23 +251,24 @@ EOF
 systemctl restart named
 if [ $? -eq 0 ]
 then
-echo "--------------------------------------"
-echo "|DNS service configuration succeeded!|"
+echo -e "\033[031m--------------------------------------\033[0m"
+echo -e "\033[034m|DNS service configuration succeeded!|\033[0m"
 systemctl enable named &> /dev/null
 firewall-cmd --add-service=dns --permanent &> /dev/null
 firewall-cmd --reload &> /dev/null
-echo "--------------------------------------"
+echo -e "\033[031m--------------------------------------\033[0m"
 nslookup $IP_0
-echo "--------------------------------------"
-else echo "|DNS service is not configured successfully!|"
+echo -e "\033[031m--------------------------------------\033[0m"
+else echo -e "\033[031m|DNS service is not configured successfully!|\033[0m"
 fi
-else echo "|DNS service not installed succesfully!|"
-echo "--------------------------------------"
+else echo -e "\033[031m|DNS service not installed succesfully!|\033[0m"
+echo -e "\033[031m--------------------------------------\033[0m"
 fi
-;;
-6)
-echo "------------------"
-echo "|Just a minute...|"
+}
+function PXE {
+echo -e "\033[031m------------------\033[0m"
+echo -e "\033[034m|Just a minute...|\033[0m"
+echo -e "\033[031m------------------\033[0m"
 yum install -y xinetd &> /dev/null
 yum install -y dhcp &> /dev/null
 IP_a=`ifconfig | awk -F ' ' 'NR==2{print$2}'`
@@ -298,7 +297,7 @@ EOF
 systemctl restart dhcpd 
 if [ $? -eq 0 ]
 then systemctl enable dhcpd &> /dev/null
-else echo " DHCP Configured error!"
+else echo -e "\033[031mDHCP Configured error!\033[0m"
 exit 0
 fi
 yum install -y tftp-server &> /dev/null
@@ -321,7 +320,7 @@ systemctl restart xinetd
 systemctl restart tftp
 if [ $? -eq 0 ]
 then systemctl enable tftp &> /dev/null
-else echo "TFTP service Configured error!"
+else echo -e "\033[031mTFTP service Configured error!\033[0m"
 exit 0
 fi
 systemctl enable xinetd &> /dev/null
@@ -332,7 +331,7 @@ cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot
 cp /media/cdrom/images/pxeboot/{vmlinuz,initrd.img} /var/lib/tftpboot
 cp /media/cdrom/isolinux/{vesamenu.c32,boot.msg} /var/lib/tftpboot
 if [ -e /var/lib/tftpboot/pxelinux.cfg ]
-then echo "File Exists!"
+then echo -e "\033[031m|File Exists!\033|[0m"
 else mkdir /var/lib/tftpboot/pxelinux.cfg &> /dev/null
 fi
 cp /media/cdrom/isolinux/isolinux.cfg /var/lib/tftpboot/pxelinux.cfg/default
@@ -462,8 +461,8 @@ EOF
 yum install -y vsftpd &> /dev/null
 systemctl restart vsftpd 
 systemctl enable vsftpd &> /dev/null
-cp -r /media/cdrom/* /var/ftp && echo "-----------------------" && echo "|Transmission complete|!"
-echo "-----------------------"
+cp -r /media/cdrom/* /var/ftp && echo -e "\033[031m-----------------------\033[0m" && echo -e "\033[034m|Transmission complete|!\033[0m"
+echo -e "\033[031m-----------------------\033[0m"
 firewall-cmd --add-service=ftp --permanent &> /dev/null
 firewall-cmd --reload &> /dev/null
 setsebool -P ftpd_connect_all_unreserved=on &> /dev/null
@@ -529,11 +528,25 @@ chrony
 %end
 " > /var/ftp/pub/ks.cfg
 if [ $? -eq 0 ]
-then echo "PXE service Configuration successed!"
-else echo "PXE service Configuration failed!"
+then echo -e "\033[034mPXE service Configuration successed!\033[0m"
+else echo -e "\033[031mPXE service Configuration failed!\033[0m"
 fi
-;;
-*) 
+}
+case $a in 
+1)
+yum;;
+2)
+IP;;
+3)
+NFS;;
+4)
+DHCP;;
+5)
+DNS;;
+6)
+PXE;;
+*)
+echo -e "\033[031minput error!\033[0m"
 exit 0
 ;;
 esac
