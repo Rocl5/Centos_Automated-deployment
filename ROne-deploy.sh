@@ -19,7 +19,8 @@ echo -e "\033[031m------------------------------\033[0m"
 echo -e "\033[034m|input 6:Configure PXE unattended installation service|\033[0m"
 echo -e "\033[031m-------------------------------------------------------\033[0m"
 read -p "please input 1,2,3,4,5,6:" a 
-function yum {
+case $a in 
+1)
 echo -e "\033[031m------------------------------\033[0m"
 echo -e "\033[034m|Prepare to configure Yum source...|\033[0m"
 echo -e "\033[031m------------------------------------\033[0m"
@@ -47,8 +48,8 @@ else echo -e "\033[031m|Yum source configuration failed!|\033[0m"
 echo -e "\033[031m----------------------------------\033[0m"
 fi
 yum repolist | grep repolist
-}
-function IP {
+;;
+2)
 echo -e "\033[031m----------------------------------------------------------------\033[0m"
 read -p "|please enter Please enter the network card name(Tips:ens33,eth0)|: " wlanname #请输入网卡名
 if [ -e /etc/sysconfig/network-scripts/ifcfg-$wlanname ]
@@ -80,8 +81,8 @@ echo -e "\033[031m----------------------------------\033[0m"
 ifconfig | awk 'NR==2'
 else echo -e "\033[031m|Network configuration failed!|\033[0m" 
 fi
-}
-function NFS {
+;;
+3)
 echo "-------------------------------------"
 yum install -y nfs-utils &> /dev/null #安装nfs服务端
 if [ $? -eq 0 ]
@@ -126,8 +127,8 @@ firewall-cmd --add-service=rpc-bind --permanent &> /dev/null
 firewall-cmd --reload &> /dev/null
 else echo -e "\033[031mNFS service installion failed!\033[0m"
 fi
-}
-function DHCP {
+;;
+4)
 echo -e "\033[031m-------------------\033[0m"
 echo -e "\033[034m|one momnet...please|\033[0m"
 yum install -y dhcp &> /dev/null 
@@ -193,8 +194,8 @@ else echo -e "\033[031mDHCP service configuration failed!\033[0m"
 fi
 else echo -e "\033[031mDHCP service not installed successfully!\033[0m"
 fi
-}
-function DNS {
+;;
+5)
 echo -e "\033[031m---------------------\033[0m"
 echo -e "\033[034m|one moment...please|\033[0m"
 yum install -y bind* &> /dev/null 
@@ -264,8 +265,8 @@ fi
 else echo -e "\033[031m|DNS service not installed succesfully!|\033[0m"
 echo -e "\033[031m--------------------------------------\033[0m"
 fi
-}
-function PXE {
+;;
+6)
 echo -e "\033[031m------------------\033[0m"
 echo -e "\033[034m|Just a minute...|\033[0m"
 echo -e "\033[031m------------------\033[0m"
@@ -531,22 +532,5 @@ if [ $? -eq 0 ]
 then echo -e "\033[034mPXE service Configuration successed!\033[0m"
 else echo -e "\033[031mPXE service Configuration failed!\033[0m"
 fi
-}
-case $a in 
-1)
-yum;;
-2)
-IP;;
-3)
-NFS;;
-4)
-DHCP;;
-5)
-DNS;;
-6)
-PXE;;
-*)
-echo -e "\033[031minput error!\033[0m"
-exit 0
 ;;
 esac
