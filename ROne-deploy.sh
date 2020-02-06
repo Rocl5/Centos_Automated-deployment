@@ -87,7 +87,7 @@ echo "-------------------------------------"
 yum install -y nfs-utils &> /dev/null #安装nfs服务端
 if [ $? -eq 0 ]
 then echo -e "|NFS service installed successfully!|"  #nfs服务安装成功
-echo "\033[031m-------------------------------------------------------------\033[0m"
+echo -e "\033[031m-------------------------------------------------------------\033[0m"
 read -p '|Please enter NFS directory path you want to share(Tips:/nfsdir)|: ' nfsdir #输入nfs共享的目录
 echo -e "\033[031m------------------------------------------------------------\033[0m"
 sleep 0.7 
