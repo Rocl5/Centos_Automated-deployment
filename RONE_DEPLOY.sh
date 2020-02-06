@@ -13,7 +13,7 @@ OPTION=$(whiptail --title "CONFIGURE SERVICE" --menu "Please select the service 
 "5." "Configure DNS server" \
 "6." "Configure PXE unattended installation service" 3>&1 1>&2 2>&3)
 case $OPTION in
-1)
+1.)
 if [ -e /media/cdrom ]
 then sleep 0.1 
 else mkdir /media/cdrom
@@ -46,7 +46,7 @@ else
 whiptail --title "Message Box" --msgbox "Yum source Configuration Failed!" 10 40
 fi
 ;;
-2)
+2.)
 function IPConfigure()
 {
 NETCARD=$(whiptail --title "Net Card" --inputbox "Please enter the network card name: " 10 60 ens33 3>&1 1>&2 2>&3)
@@ -76,7 +76,7 @@ else
 whiptail --title "Message Box" --msgbox "Network Configration Failed!" 10 40
 fi
 ;;
-3)
+3.)
 function nfs()
 {
 yum install -y nfs-utils &> /dev/null 
@@ -131,7 +131,7 @@ else
 whiptail --title "Message Box" --msgbox "NFS Service Configuration Failed!" 10 40 
 fi
 ;;
-4)
+4.)
 yum install -y dhcp &> /dev/null &
 {
 for ((i = 0 ; i <=100 ; i+=5))
@@ -189,7 +189,7 @@ else
 whiptail --title "Message Box" --msgbox "DHCP Service Configuration Failed" 10 40
 fi
 ;;
-5)
+5.)
 yum install -y bind* &> /dev/null &
 {
 for ((i = 0 ; i <=100 ; i+=5))
@@ -265,7 +265,7 @@ else
 whiptail --title "Message Box" --msgbox "DNS Service Configuration Failed!" 10 50
 fi 
 ;;
-6)
+6.)
 function installed()
 {
 yum install -y xinetd &> /dev/null 
